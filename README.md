@@ -1,5 +1,12 @@
 # Laravel App
 
+Для клонування цього репозиторію разом з підмодулями, використовуйте команду з опцією `--recurse-submodules`, яка
+забезпечить автоматичне ініціалізування та оновлення кожного підмодуля під час клонування основного репозиторію:
+
+```bash
+git clone --recurse-submodules git@github.com:andreas-hs/nd-quick-start.git
+```
+
 ## Оптимізація RabbitMQ
 
 [RabbitMQService.php](nd-laravel-app/app/Services/RabbitMQService.php)

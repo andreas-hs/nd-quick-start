@@ -1,4 +1,4 @@
 start-all:
-	cd nd-common-infra && make up
-	cd nd-go-app && make up
-	cd nd-laravel-app && make up
+	cd nd-common-infra && make init
+	cd nd-go-app && make init
+	cd nd-laravel-app && make init

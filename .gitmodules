@@ -1,0 +1,9 @@
+[submodule "nd-common-infra"]
+	path = nd-common-infra
+	url = git@github.com:andreas-hs/nd-common-infra.git
+[submodule "nd-laravel-app"]
+	path = nd-laravel-app
+	url = git@github.com:andreas-hs/nd-laravel-app.git
+[submodule "nd-go-app"]
+	path = nd-go-app
+	url = git@github.com:andreas-hs/nd-go-app.git

@@ -7,6 +7,12 @@
 git clone --recurse-submodules git@github.com:andreas-hs/nd-quick-start.git
 ```
 
+Для запуску всіх необхідних сервісів використовуйте наступну команду:
+
+```bash
+make start-all
+```
+
 ## Оптимізація RabbitMQ
 
 [RabbitMQService.php](nd-laravel-app/app/Services/RabbitMQService.php)

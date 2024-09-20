@@ -1,70 +1,62 @@
-# Quick start
+# Quick Start
 
-Для клонування цього репозиторію разом з підмодулями, використовуйте команду з опцією `--recurse-submodules`, яка
-забезпечить автоматичне ініціалізування та оновлення кожного підмодуля під час клонування основного репозиторію:
+To clone this repository along with its submodules, use the command with the `--recurse-submodules` option, which ensures automatic initialization and updating of each submodule during the cloning of the main repository:
 
 ```bash
 git clone --recurse-submodules git@github.com:andreas-hs/nd-quick-start.git
 ```
 
-Для запуску всіх необхідних сервісів використовуйте наступну команду:
+To start all the necessary services, use the following command:
 
 ```bash
 make start-all
 ```
 
-Для відправки повідомлень в RabbitMQ використовуйте наступну команду:
+To send messages to RabbitMQ, use the following command:
 
 ```bash
 cd nd-laravel-app && make artisan rabbitmq:send-all
 ```
 
-Якщо go-app вже запущено то всі данні зразу будуть обролені та передані в `destination_data`
-Якщо ні, то запустіть:
+If the Go app is already running, all the data will be processed and sent to `destination_data` right away. If not, start it with:
 
 ```bash
 cd nd-go-app && make up
 ```
 
-## Оптимізація RabbitMQ
+## RabbitMQ Optimization
 
 [RabbitMQService.php](nd-laravel-app/app/Services/RabbitMQService.php)
 
-1. **Пакетна відправка повідомлень**: Замість відправлення кожного повідомлення окремо використовується пакетна
-   відправка, що значно зменшує кількість мережевих запитів і підвищує загальну ефективність системи.
+1. **Batch Message Sending**: Instead of sending each message separately, batch sending is used, significantly reducing the number of network requests and improving overall system efficiency.
 
-2. **Prefetch Count**: Більша кількість повідомлень може оброблятись одночасно, що прискорює процес споживання
-   повідомлень.
+2. **Prefetch Count**: A larger number of messages can be processed simultaneously, speeding up the message consumption process.
 
-3. **Manual режим підтвердження**: Це дозволяє підтверджувати пакет повідомлень, що знижує час на роботу з RabbitMQ.
+3. **Manual Acknowledgment Mode**: Allows acknowledgment of a batch of messages, reducing the time spent working with RabbitMQ.
 
-4. **Асинхронна публікація**: Повідомлення відправляються асинхронно, що зменшує очікування підтвердження для кожного
-   повідомлення перед відправкою наступного.
+4. **Asynchronous Publishing**: Messages are sent asynchronously, reducing the wait time for confirmation before sending the next message.
 
-5. **Dead-Letter Exchange (DLX) і TTL (Time-to-Live)**: Для обробки повідомлень, що не вдалося доставити,
-   використовується черга з Dead-Letter Exchange (DLX) та параметром TTL. Це підвищує надійність обробки повідомлень.
+5. **Dead-Letter Exchange (DLX) and TTL (Time-to-Live)**: A Dead-Letter Exchange (DLX) queue with a TTL parameter is used to handle undelivered messages, improving message processing reliability.
 
-#### Результати оптимізації
+#### Optimization Results
 
-| Показник          | Синхронно, без batch | Асинхронно, з batch | Різниця (секунди) | Різниця (%) |
-|-------------------|----------------------|---------------------|-------------------|-------------|
-| **Загальний час** | 15.06 секунд         | 3.03 секунди        | 12.03 секунд      | **79.9%**   |
-| **Час RabbitMQ**  | 14.59 секунд         | 0.48 секунд         | 14.11 секунд      | **96.7%**   |
+| Metric            | Synchronous, no batch | Asynchronous, with batch | Difference (seconds) | Difference (%) |
+|-------------------|-----------------------|--------------------------|----------------------|----------------|
+| **Total Time**     | 15.06 seconds         | 3.03 seconds             | 12.03 seconds        | **79.9%**      |
+| **RabbitMQ Time**  | 14.59 seconds         | 0.48 seconds             | 14.11 seconds        | **96.7%**      |
 
-## Використання транзакцій та пакетної вставки (Batch Insert) в Seeder
+## Using Transactions and Batch Insert in Seeder
 
 [SourceDataSeeder.php](nd-laravel-app/database/seeders/SourceDataSeeder.php)
 
-Транзакції групують кілька операцій у одну, що забезпечує:
+Transactions group multiple operations into one, providing:
 
-1. **Цілісність даних**: Якщо виникає помилка, всі операції відміняються.
-2. **Швидкість**: Транзакції прискорюють вставку, зменшуючи кількість фіксацій (`commit`). У нашому випадку це дає
-   приріст швидкості на **приблизно 4.65%** або **140 мс** для вставки 10,000 записів:
-    - **Без транзакції**: 2.974 сек.
-    - **З транзакцією**: 2.836 сек.
+1. **Data Integrity**: If an error occurs, all operations are rolled back.
+2. **Speed**: Transactions speed up insertion by reducing the number of commits. In our case, this results in a speed increase of **approximately 4.65%** or **140 ms** for inserting 10,000 records:
+   - **Without transaction**: 2.974 sec.
+   - **With transaction**: 2.836 sec.
 
-#### Чому не перевіряємо максимальний розмір строки запиту?
+#### Why don’t we check the maximum string size of the query?
 
-1. **Пакетна вставка**: Ми вставляємо дані пакетами по **1,000 записів**, що не наближає нас до лімітів MySQL.
-2. **Достатньо для задачі**: Поточний підхід з батчами оптимізує вставку і не потребує додаткових перевірок в рамках
-   тестової задачі.
+1. **Batch Insert**: We insert data in batches of **1,000 records**, which doesn't approach MySQL limits.
+2. **Sufficient for the task**: The current batch approach optimizes insertion and does not require additional checks within the scope of the test task.

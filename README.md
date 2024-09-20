@@ -1,4 +1,4 @@
-# Laravel App
+# Quick start
 
 Для клонування цього репозиторію разом з підмодулями, використовуйте команду з опцією `--recurse-submodules`, яка
 забезпечить автоматичне ініціалізування та оновлення кожного підмодуля під час клонування основного репозиторію:
@@ -11,6 +11,19 @@ git clone --recurse-submodules git@github.com:andreas-hs/nd-quick-start.git
 
 ```bash
 make start-all
+```
+
+Для відправки повідомлень в RabbitMQ використовуйте наступну команду:
+
+```bash
+cd nd-laravel-app && make artisan rabbitmq:send-all
+```
+
+Якщо go-app вже запущено то всі данні зразу будуть обролені та передані в `destination_data`
+Якщо ні, то запустіть:
+
+```bash
+cd nd-go-app && make up
 ```
 
 ## Оптимізація RabbitMQ
